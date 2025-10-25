@@ -1,9 +1,8 @@
 import { useLocation, useNavigate } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import Header from '@/components/Header'
-import { Heart, Calendar, Baby } from 'lucide-react'
+import { Heart, Calendar, Bot, BookOpen, Apple } from 'lucide-react'
 
 const Dashboard = () => {
   const location = useLocation()
@@ -135,7 +134,7 @@ const Dashboard = () => {
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {months.map((month, index) => (
+            {months.map((month) => (
               <div 
                 key={month.number} 
                 className="group relative"
@@ -190,73 +189,118 @@ const Dashboard = () => {
           </div>
         </div>
 
-        {/* Quick Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <Card className="medical-card border-0 bg-gradient-to-br from-primary/5 to-accent/5 hover:shadow-lg transition-all duration-300">
-            <CardHeader className="pb-3">
-              <div className="flex items-center space-x-3">
-                <div className="p-2 bg-primary/10 rounded-lg">
-                  <Calendar className="h-5 w-5 text-primary" />
+        {/* Features Overview */}
+        <div className="grid md:grid-cols-3 gap-6">
+          <Card className="group relative overflow-hidden border-0 bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 hover:from-blue-100 hover:via-indigo-100 hover:to-purple-100 transition-all duration-500 hover:shadow-2xl hover:-translate-y-2 cursor-pointer">
+            <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-purple-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+            <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-blue-400/10 to-purple-400/10 rounded-full -translate-y-16 translate-x-16 group-hover:scale-110 transition-transform duration-500"></div>
+            <CardHeader className="relative pb-4">
+              <div className="flex items-center space-x-4">
+                <div className="relative">
+                  <div className="p-3 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl shadow-lg group-hover:shadow-blue-500/25 group-hover:scale-110 transition-all duration-300">
+                    <Bot className="h-6 w-6 text-white" />
+                  </div>
                 </div>
-                <CardTitle className="text-lg medical-text-primary">Total Months</CardTitle>
+                <div>
+                  <CardTitle className="text-xl font-bold text-gray-800 group-hover:text-blue-700 transition-colors duration-300">
+                    AI Guidance
+                  </CardTitle>
+                  <div className="flex items-center space-x-1 mt-1">
+                    <div className="w-1 h-1 bg-blue-500 rounded-full"></div>
+                    <div className="w-1 h-1 bg-blue-400 rounded-full"></div>
+                    <div className="w-1 h-1 bg-blue-300 rounded-full"></div>
+                  </div>
+                </div>
               </div>
             </CardHeader>
-            <CardContent className="space-y-3">
-              <div className="flex items-baseline space-x-2">
-                <div className="text-4xl font-bold text-primary">9</div>
-                <span className="text-sm medical-text-muted">months</span>
-              </div>
-              <p className="text-sm medical-text-secondary">Complete pregnancy duration</p>
-              <div className="w-full bg-primary/10 rounded-full h-2">
-                <div className="bg-primary h-2 rounded-full w-full"></div>
+            <CardContent className="relative space-y-4">
+              <p className="text-gray-600 leading-relaxed group-hover:text-gray-700 transition-colors duration-300">
+                Get personalized advice and answers to your pregnancy questions with our AI assistant.
+              </p>
+              <div className="flex items-center justify-between pt-2">
+                <div className="flex items-center space-x-2">
+                  <div className="w-2 h-2 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full animate-pulse"></div>
+                  <span className="text-xs font-medium text-blue-600">Always Available</span>
+                </div>
+                <div className="px-3 py-1 bg-gradient-to-r from-blue-100 to-purple-100 rounded-full">
+                  <span className="text-xs font-semibold text-blue-700">Smart</span>
+                </div>
               </div>
             </CardContent>
           </Card>
           
-          <Card className="medical-card border-0 bg-gradient-to-br from-accent/5 to-primary/5 hover:shadow-lg transition-all duration-300">
-            <CardHeader className="pb-3">
-              <div className="flex items-center space-x-3">
-                <div className="p-2 bg-accent/10 rounded-lg">
-                  <Heart className="h-5 w-5 text-accent" />
+          <Card className="group relative overflow-hidden border-0 bg-gradient-to-br from-emerald-50 via-teal-50 to-cyan-50 hover:from-emerald-100 hover:via-teal-100 hover:to-cyan-100 transition-all duration-500 hover:shadow-2xl hover:-translate-y-2 cursor-pointer">
+            <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 to-cyan-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+            <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-emerald-400/10 to-cyan-400/10 rounded-full -translate-y-16 translate-x-16 group-hover:scale-110 transition-transform duration-500"></div>
+            <CardHeader className="relative pb-4">
+              <div className="flex items-center space-x-4">
+                <div className="relative">
+                  <div className="p-3 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl shadow-lg group-hover:shadow-emerald-500/25 group-hover:scale-110 transition-all duration-300">
+                    <BookOpen className="h-6 w-6 text-white" />
+                  </div>
                 </div>
-                <CardTitle className="text-lg medical-text-primary">AI Insights</CardTitle>
+                <div>
+                  <CardTitle className="text-xl font-bold text-gray-800 group-hover:text-emerald-700 transition-colors duration-300">
+                    Monthly Insights
+                  </CardTitle>
+                  <div className="flex items-center space-x-1 mt-1">
+                    <div className="w-1 h-1 bg-emerald-500 rounded-full"></div>
+                    <div className="w-1 h-1 bg-emerald-400 rounded-full"></div>
+                    <div className="w-1 h-1 bg-emerald-300 rounded-full"></div>
+                  </div>
+                </div>
               </div>
             </CardHeader>
-            <CardContent className="space-y-3">
-              <div className="flex items-baseline space-x-2">
-                <div className="text-4xl font-bold text-accent">24/7</div>
-                <span className="text-sm medical-text-muted">support</span>
-              </div>
-              <p className="text-sm medical-text-secondary">Always available assistance</p>
-              <div className="flex items-center space-x-1">
-                <div className="w-2 h-2 bg-accent rounded-full animate-pulse"></div>
-                <div className="w-2 h-2 bg-accent/60 rounded-full animate-pulse" style={{animationDelay: '0.2s'}}></div>
-                <div className="w-2 h-2 bg-accent/30 rounded-full animate-pulse" style={{animationDelay: '0.4s'}}></div>
+            <CardContent className="relative space-y-4">
+              <p className="text-gray-600 leading-relaxed group-hover:text-gray-700 transition-colors duration-300">
+                Detailed information about your baby's development and what to expect each month.
+              </p>
+              <div className="flex items-center justify-between pt-2">
+                <div className="flex items-center space-x-2">
+                  <div className="w-2 h-2 bg-gradient-to-r from-emerald-500 to-cyan-500 rounded-full animate-pulse"></div>
+                  <span className="text-xs font-medium text-emerald-600">Comprehensive</span>
+                </div>
+                <div className="px-3 py-1 bg-gradient-to-r from-emerald-100 to-cyan-100 rounded-full">
+                  <span className="text-xs font-semibold text-emerald-700">Detailed</span>
+                </div>
               </div>
             </CardContent>
           </Card>
           
-          <Card className="medical-card border-0 bg-gradient-to-br from-primary/5 to-accent/5 hover:shadow-lg transition-all duration-300">
-            <CardHeader className="pb-3">
-              <div className="flex items-center space-x-3">
-                <div className="p-2 bg-primary/10 rounded-lg">
-                  <Baby className="h-5 w-5 text-primary" />
+          <Card className="group relative overflow-hidden border-0 bg-gradient-to-br from-rose-50 via-pink-50 to-red-50 hover:from-rose-100 hover:via-pink-100 hover:to-red-100 transition-all duration-500 hover:shadow-2xl hover:-translate-y-2 cursor-pointer">
+            <div className="absolute inset-0 bg-gradient-to-br from-rose-500/5 to-red-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+            <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-rose-400/10 to-red-400/10 rounded-full -translate-y-16 translate-x-16 group-hover:scale-110 transition-transform duration-500"></div>
+            <CardHeader className="relative pb-4">
+              <div className="flex items-center space-x-4">
+                <div className="relative">
+                  <div className="p-3 bg-gradient-to-br from-rose-500 to-pink-600 rounded-2xl shadow-lg group-hover:shadow-rose-500/25 group-hover:scale-110 transition-all duration-300">
+                    <Apple className="h-6 w-6 text-white" />
+                  </div>
                 </div>
-                <CardTitle className="text-lg medical-text-primary">Personalized</CardTitle>
+                <div>
+                  <CardTitle className="text-xl font-bold text-gray-800 group-hover:text-rose-700 transition-colors duration-300">
+                    Diet Plan
+                  </CardTitle>
+                  <div className="flex items-center space-x-1 mt-1">
+                    <div className="w-1 h-1 bg-rose-500 rounded-full"></div>
+                    <div className="w-1 h-1 bg-rose-400 rounded-full"></div>
+                    <div className="w-1 h-1 bg-rose-300 rounded-full"></div>
+                  </div>
+                </div>
               </div>
             </CardHeader>
-            <CardContent className="space-y-3">
-              <div className="flex items-baseline space-x-2">
-                <div className="text-4xl font-bold text-primary">100%</div>
-                <span className="text-sm medical-text-muted">tailored</span>
-              </div>
-              <p className="text-sm medical-text-secondary">Customized guidance for you</p>
-              <div className="flex items-center space-x-1">
-                <div className="w-1 h-1 bg-primary rounded-full"></div>
-                <div className="w-1 h-1 bg-primary/60 rounded-full"></div>
-                <div className="w-1 h-1 bg-primary/30 rounded-full"></div>
-                <div className="w-1 h-1 bg-primary/20 rounded-full"></div>
-                <div className="w-1 h-1 bg-primary/10 rounded-full"></div>
+            <CardContent className="relative space-y-4">
+              <p className="text-gray-600 leading-relaxed group-hover:text-gray-700 transition-colors duration-300">
+                Personalized nutrition guidance and meal plans tailored for each stage of your pregnancy.
+              </p>
+              <div className="flex items-center justify-between pt-2">
+                <div className="flex items-center space-x-2">
+                  <div className="w-2 h-2 bg-gradient-to-r from-rose-500 to-pink-500 rounded-full animate-pulse"></div>
+                  <span className="text-xs font-medium text-rose-600">Healthy</span>
+                </div>
+                <div className="px-3 py-1 bg-gradient-to-r from-rose-100 to-pink-100 rounded-full">
+                  <span className="text-xs font-semibold text-rose-700">Nutritious</span>
+                </div>
               </div>
             </CardContent>
           </Card>
