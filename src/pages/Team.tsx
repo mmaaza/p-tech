@@ -9,49 +9,40 @@ const Team = () => {
   const navigate = useNavigate()
   const user = location.state?.user
 
+  const defaultAvatar = "https://www.gravatar.com/avatar/?d=mp&f=y"
   const teamMembers = [
     {
       id: 1,
-      name: "Dr. Sarah Johnson",
-      role: "Lead Medical Advisor",
-      specialty: "Obstetrics & Gynecology",
-      experience: "15+ years",
-      description: "Board-certified OB/GYN with extensive experience in high-risk pregnancies and maternal-fetal medicine.",
-      image: "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=400&h=400&fit=crop&crop=face",
-      skills: ["Prenatal Care", "High-Risk Pregnancy", "Maternal Health"],
-      social: {
-        linkedin: "#",
-        email: "sarah@pregnitech.com"
-      }
+      name: "Hashir Ehtisham",
+      image: defaultAvatar,
+      role: "",
+      specialty: "",
+      experience: "",
+      description: "",
+      skills: [],
+      social: {}
     },
     {
       id: 2,
-      name: "Dr. Michael Chen",
-      role: "AI Research Director",
-      specialty: "Medical AI & Machine Learning",
-      experience: "12+ years",
-      description: "PhD in Computer Science with focus on medical AI applications, specializing in pregnancy health monitoring.",
-      image: "https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?w=400&h=400&fit=crop&crop=face",
-      skills: ["AI Development", "Machine Learning", "Health Tech"],
-      social: {
-        github: "#",
-        linkedin: "#",
-        email: "michael@pregnitech.com"
-      }
+      name: "Kainat Ali",
+      image: defaultAvatar,
+      role: "",
+      specialty: "",
+      experience: "",
+      description: "",
+      skills: [],
+      social: {}
     },
     {
       id: 3,
-      name: "Dr. Emily Rodriguez",
-      role: "Nutrition Specialist",
-      specialty: "Prenatal Nutrition",
-      experience: "10+ years",
-      description: "Registered Dietitian specializing in prenatal and postnatal nutrition, helping mothers maintain optimal health.",
-      image: "https://images.unsplash.com/photo-1594824373631-0b4a0b4a0b4a?w=400&h=400&fit=crop&crop=face",
-      skills: ["Prenatal Nutrition", "Diet Planning", "Maternal Wellness"],
-      social: {
-        linkedin: "#",
-        email: "emily@pregnitech.com"
-      }
+      name: "Lameea Khan",
+      image: defaultAvatar,
+      role: "",
+      specialty: "",
+      experience: "",
+      description: "",
+      skills: [],
+      social: {}
     }
   ]
 
@@ -216,26 +207,36 @@ const Team = () => {
                       <CardTitle className="text-xl font-bold medical-text-primary group-hover:text-primary transition-colors">
                         {member.name}
                       </CardTitle>
-                      <div className="space-y-1">
-                        <p className="text-sm font-medium text-primary">{member.role}</p>
-                        <p className="text-xs medical-text-secondary">{member.specialty}</p>
-                        <div className="flex items-center justify-center space-x-2">
-                          <div className="w-1 h-1 bg-primary rounded-full"></div>
-                          <span className="text-xs medical-text-muted">{member.experience}</span>
+                      {(member.role || member.specialty || member.experience) && (
+                        <div className="space-y-1">
+                          {member.role && (
+                            <p className="text-sm font-medium text-primary">{member.role}</p>
+                          )}
+                          {member.specialty && (
+                            <p className="text-xs medical-text-secondary">{member.specialty}</p>
+                          )}
+                          {member.experience && (
+                            <div className="flex items-center justify-center space-x-2">
+                              <div className="w-1 h-1 bg-primary rounded-full"></div>
+                              <span className="text-xs medical-text-muted">{member.experience}</span>
+                            </div>
+                          )}
                         </div>
-                      </div>
+                      )}
                     </div>
                   </div>
                 </CardHeader>
                 
                 <CardContent className="relative space-y-4">
-                  <p className="text-sm medical-text-secondary leading-relaxed text-center">
-                    {member.description}
-                  </p>
+                  {member.description && (
+                    <p className="text-sm medical-text-secondary leading-relaxed text-center">
+                      {member.description}
+                    </p>
+                  )}
                   
                   <div className="space-y-3">
                     <div className="flex flex-wrap gap-2 justify-center">
-                      {member.skills.map((skill, index) => (
+                      {member.skills && member.skills.map((skill, index) => (
                         <span 
                           key={index}
                           className="px-3 py-1 bg-primary/10 text-primary text-xs font-medium rounded-full"
