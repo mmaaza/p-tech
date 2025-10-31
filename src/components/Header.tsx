@@ -1,8 +1,9 @@
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { Baby, LogOut, ArrowLeft, Menu, X, User, Bell, Settings } from 'lucide-react'
-import { useNavigate } from 'react-router-dom'
+import { Baby, LogOut, ArrowLeft, Menu, X, User, Bell, Settings, Users, Home } from 'lucide-react'
+import { useNavigate, useLocation } from 'react-router-dom'
 import { useState } from 'react'
+import { useAuth } from '@/contexts/AuthContext'
 
 interface HeaderProps {
   user?: {
@@ -17,9 +18,12 @@ interface HeaderProps {
 
 const Header = ({ user, showBackButton = false, backPath = '/dashboard', title, subtitle }: HeaderProps) => {
   const navigate = useNavigate()
+  const location = useLocation()
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const { user: authUser, logout } = useAuth()
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    await logout()
     navigate('/')
   }
 
@@ -34,6 +38,13 @@ const Header = ({ user, showBackButton = false, backPath = '/dashboard', title, 
   const getUserInitials = (name: string) => {
     return name.split(' ').map(n => n[0]).join('').toUpperCase()
   }
+
+  const effectiveUser = user || (authUser ? { name: authUser.displayName || 'User', email: authUser.email || '' } : undefined)
+
+  const navigationItems = [
+    { path: '/dashboard', label: 'Dashboard', icon: Home },
+    { path: '/team', label: 'Team', icon: Users }
+  ]
 
   return (
     <header className="bg-white/95 backdrop-blur-md shadow-sm border-b border-gray-200/50 sticky top-0 z-50">
@@ -80,9 +91,33 @@ const Header = ({ user, showBackButton = false, backPath = '/dashboard', title, 
             </div>
           </div>
 
+          {/* Navigation - Desktop */}
+          <div className="hidden md:flex items-center space-x-2">
+            {effectiveUser && navigationItems.map((item) => {
+              const Icon = item.icon
+              const isActive = location.pathname === item.path
+              return (
+                <Button
+                  key={item.path}
+                  variant={isActive ? "default" : "ghost"}
+                  size="sm"
+                  onClick={() => navigate(item.path, { state: { user: effectiveUser } })}
+                  className={`flex items-center space-x-2 transition-all duration-200 ${
+                    isActive 
+                      ? 'bg-primary text-white shadow-md' 
+                      : 'hover:bg-primary/10 text-gray-600 hover:text-primary'
+                  }`}
+                >
+                  <Icon className="h-4 w-4" />
+                  <span>{item.label}</span>
+                </Button>
+              )
+            })}
+          </div>
+
           {/* Right Section - Desktop */}
           <div className="hidden md:flex items-center space-x-4">
-            {user && (
+            {effectiveUser && (
               <div className="flex items-center space-x-3">
                 {/* Notifications */}
                 <Button variant="ghost" size="sm" className="relative hover:bg-primary/10">
@@ -93,11 +128,11 @@ const Header = ({ user, showBackButton = false, backPath = '/dashboard', title, 
                 {/* User Profile */}
                 <div className="flex items-center space-x-3 bg-gray-50/50 rounded-full px-3 py-2 hover:bg-gray-100/50 transition-colors duration-200">
                   <div className="w-8 h-8 bg-gradient-to-br from-primary to-accent rounded-full flex items-center justify-center text-white text-sm font-semibold">
-                    {getUserInitials(user.name)}
+                    {getUserInitials(effectiveUser.name)}
                   </div>
                   <div className="text-left">
-                    <p className="text-sm font-medium medical-text-primary">{user.name}</p>
-                    <p className="text-xs medical-text-muted hidden lg:block">{user.email}</p>
+                    <p className="text-sm font-medium medical-text-primary">{effectiveUser.name}</p>
+                    <p className="text-xs medical-text-muted hidden lg:block">{effectiveUser.email}</p>
                   </div>
                 </div>
               </div>
@@ -131,17 +166,44 @@ const Header = ({ user, showBackButton = false, backPath = '/dashboard', title, 
         {isMobileMenuOpen && (
           <div className="md:hidden border-t border-gray-200/50 py-4">
             <div className="space-y-4">
-              {user && (
+              {effectiveUser && (
                 <div className="flex items-center space-x-3 bg-gray-50/50 rounded-lg px-4 py-3">
                   <div className="w-10 h-10 bg-gradient-to-br from-primary to-accent rounded-full flex items-center justify-center text-white font-semibold">
-                    {getUserInitials(user.name)}
+                    {getUserInitials(effectiveUser.name)}
                   </div>
                   <div className="flex-1">
-                    <p className="font-medium medical-text-primary">{user.name}</p>
-                    <p className="text-sm medical-text-muted">{user.email}</p>
+                    <p className="font-medium medical-text-primary">{effectiveUser.name}</p>
+                    <p className="text-sm medical-text-muted">{effectiveUser.email}</p>
                   </div>
                 </div>
               )}
+              
+              {/* Mobile Navigation */}
+              <div className="space-y-2">
+                {navigationItems.map((item) => {
+                  const Icon = item.icon
+                  const isActive = location.pathname === item.path
+                  return (
+                    <Button
+                      key={item.path}
+                      variant={isActive ? "default" : "ghost"}
+                      size="sm"
+                      onClick={() => {
+                        navigate(item.path, { state: { user: effectiveUser } })
+                        setIsMobileMenuOpen(false)
+                      }}
+                      className={`w-full justify-start space-x-3 ${
+                        isActive 
+                          ? 'bg-primary text-white shadow-md' 
+                          : 'hover:bg-primary/10 text-gray-600 hover:text-primary'
+                      }`}
+                    >
+                      <Icon className="h-4 w-4" />
+                      <span>{item.label}</span>
+                    </Button>
+                  )
+                })}
+              </div>
               
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-2">

@@ -464,30 +464,16 @@ const MonthPage = () => {
               </div>
             </div>
             
-            {/* Iframe Space - This is where the HuggingFace bot will be embedded */}
-            <div className="relative w-full h-[600px] border-2 border-dashed medical-border rounded-xl overflow-hidden bg-gradient-to-br from-secondary to-gray-50/50">
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div className="text-center max-w-md px-6">
-                  <div className="p-4 bg-white/80 rounded-2xl mb-6 backdrop-blur-sm">
-                    <Baby className="h-16 w-16 text-primary mx-auto mb-4" />
-                    <h3 className="text-xl font-semibold medical-text-primary mb-3">HuggingFace AI Assistant</h3>
-                    <p className="text-sm medical-text-secondary leading-relaxed mb-4">
-                      This space is reserved for your HuggingFace chatbot iframe. 
-                      Replace this placeholder with your actual iframe embed code.
-                    </p>
-                    <div className="bg-white rounded-lg p-4 border medical-border text-xs text-left">
-                      <code className="medical-text-primary font-mono">
-                        {`<iframe
-  src="your-huggingface-space-url"
-  width="100%"
-  height="600px"
-  frameborder="0"
-></iframe>`}
-                      </code>
-                    </div>
-                  </div>
-                </div>
-              </div>
+            {/* HuggingFace AI Assistant Iframe */}
+            <div className="relative w-full flex items-center justify-center rounded-xl overflow-hidden bg-gradient-to-br from-secondary to-gray-50/50 border medical-border">
+              <iframe
+                src={`https://hashirehtisham-pregnitech-month-${month}.hf.space`}
+                frameBorder="0"
+                width="850"
+                height="450"
+                className="w-full max-w-full h-[650px] md:h-[700px] rounded-xl"
+                title={`PregniTech Month ${month} AI Assistant`}
+              />
             </div>
           </CardContent>
         </Card>
