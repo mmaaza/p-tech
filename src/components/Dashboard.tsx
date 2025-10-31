@@ -5,7 +5,16 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge.jsx'
 import { Heart, Baby, Calendar, LogOut } from 'lucide-react'
 
-const Dashboard = ({ user, onLogout, onMonthSelect }) => {
+interface DashboardProps {
+  user: {
+    name: string
+    email: string
+  }
+  onLogout: () => void
+  onMonthSelect: (value: string) => void
+}
+
+const Dashboard = ({ user, onLogout, onMonthSelect }: DashboardProps) => {
   const [selectedMonth, setSelectedMonth] = useState('')
 
   const pregnancyMonths = [
@@ -20,7 +29,7 @@ const Dashboard = ({ user, onLogout, onMonthSelect }) => {
     { value: '9', label: 'Month 9 - Birth Preparation', description: 'Full term and delivery readiness' }
   ]
 
-  const handleMonthSelection = (value) => {
+  const handleMonthSelection = (value: string) => {
     setSelectedMonth(value)
     onMonthSelect(value)
   }

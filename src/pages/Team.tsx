@@ -4,13 +4,29 @@ import { Button } from '@/components/ui/button'
 import Header from '@/components/Header'
 import { Users, Heart, Award, Sparkles, Github, Linkedin, Mail, ArrowLeft } from 'lucide-react'
 
+interface TeamMember {
+  id: number
+  name: string
+  image: string
+  role: string
+  specialty: string
+  experience: string
+  description: string
+  skills: string[]
+  social: {
+    linkedin?: string
+    github?: string
+    email?: string
+  }
+}
+
 const Team = () => {
   const location = useLocation()
   const navigate = useNavigate()
   const user = location.state?.user
 
   const defaultAvatar = "https://www.gravatar.com/avatar/?d=mp&f=y"
-  const teamMembers = [
+  const teamMembers: TeamMember[] = [
     {
       id: 1,
       name: "Hashir Ehtisham",

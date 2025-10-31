@@ -1,6 +1,6 @@
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { Baby, LogOut, ArrowLeft, Menu, X, User, Bell, Settings, Users, Home } from 'lucide-react'
+import { Baby, LogOut, ArrowLeft, Menu, X, Bell, Users, Home } from 'lucide-react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { useState } from 'react'
 import { useAuth } from '@/contexts/AuthContext'

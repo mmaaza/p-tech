@@ -4,7 +4,11 @@ import { Input } from '@/components/ui/input.jsx'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card.jsx'
 import { Label } from '@/components/ui/label.jsx'
 
-const Login = ({ onLogin }) => {
+interface LoginProps {
+  onLogin: (user: { email: string; name: string }) => void
+}
+
+const Login = ({ onLogin }: LoginProps) => {
   const [formData, setFormData] = useState({
     email: '',
     password: ''
@@ -12,7 +16,7 @@ const Login = ({ onLogin }) => {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
 
-  const handleInputChange = (e) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
     setFormData(prev => ({
       ...prev,
@@ -20,7 +24,7 @@ const Login = ({ onLogin }) => {
     }))
   }
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     setIsLoading(true)
     setError('')
