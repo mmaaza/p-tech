@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { getFirebaseAuth } from '@/lib/firebase'
-import { onAuthStateChanged, type User } from 'firebase/auth'
+import { onAuthStateChanged, type User, deleteUser, signOut } from 'firebase/auth'
 import { handleHuggingFaceCallback, storeHuggingFaceToken } from '@/lib/huggingface'
 import { Baby } from 'lucide-react'
 
@@ -14,8 +14,11 @@ const HuggingFaceCallback = () => {
   useEffect(() => {
     const auth = getFirebaseAuth()
     
+    // Check if this is a registration flow
+    const isRegistrationFlow = sessionStorage.getItem('is_registration_flow') === 'true'
+    
     // Wait for Firebase auth to be ready
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       if (!currentUser) {
         setStatus('error')
         setErrorMessage('You must be logged in to connect Hugging Face. Please log in first.')
@@ -31,34 +34,94 @@ const HuggingFaceCallback = () => {
       const error = searchParams.get('error')
       const errorDescription = searchParams.get('error_description')
 
-      // Handle OAuth errors
+      // Handle OAuth errors from Hugging Face redirect
       if (error) {
+        const errorMsg = errorDescription || error || 'Authentication failed'
         setStatus('error')
-        setErrorMessage(errorDescription || error || 'Authentication failed')
-        setTimeout(() => {
-          navigate('/dashboard')
-        }, 3000)
+        setErrorMessage(errorMsg)
+        
+        // CRITICAL: If this is a registration flow, delete the account
+        if (isRegistrationFlow) {
+          await cleanupFailedRegistration(currentUser, errorMsg)
+        } else {
+          setTimeout(() => {
+            navigate('/dashboard')
+          }, 3000)
+        }
         return
       }
 
       // Validate required parameters
       if (!code || !state) {
+        const errorMsg = 'Missing authorization code or state parameter. The authentication request may have been corrupted.'
         setStatus('error')
-        setErrorMessage('Missing authorization code or state parameter')
-        setTimeout(() => {
-          navigate('/dashboard')
-        }, 3000)
+        setErrorMessage(errorMsg)
+        
+        // CRITICAL: If this is a registration flow, delete the account
+        if (isRegistrationFlow) {
+          await cleanupFailedRegistration(currentUser, errorMsg)
+        } else {
+          setTimeout(() => {
+            navigate('/dashboard')
+          }, 3000)
+        }
         return
       }
 
       // Process OAuth callback
-      processCallback(currentUser, code, state)
+      processCallback(currentUser, code, state, isRegistrationFlow)
     })
 
     return () => unsubscribe()
   }, [searchParams, navigate])
 
-  const processCallback = async (currentUser: User, code: string, state: string) => {
+  /**
+   * Cleanup function to delete account and redirect to login on registration failure
+   */
+  const cleanupFailedRegistration = async (user: User, errorMessage: string) => {
+    try {
+      console.error('Registration failed during Hugging Face callback:', errorMessage)
+      
+      // Delete the Firebase account
+      try {
+        await deleteUser(user)
+        console.log('Account deleted due to registration failure')
+      } catch (deleteError: any) {
+        console.error('Error deleting account:', deleteError)
+        // If deleteUser fails (e.g., user already signed out), try signOut
+        try {
+          await signOut(getFirebaseAuth())
+        } catch (signOutError) {
+          console.error('Error signing out:', signOutError)
+        }
+      }
+      
+      // Clean up session storage
+      sessionStorage.removeItem('pending_user')
+      sessionStorage.removeItem('is_registration_flow')
+      
+      // Redirect to login page with error message
+      setTimeout(() => {
+        navigate('/', { 
+          state: { 
+            registrationError: errorMessage || 'Account registration failed. Please try again.'
+          } 
+        })
+      }, 3000)
+    } catch (cleanupError) {
+      console.error('Error during cleanup:', cleanupError)
+      // Still redirect to login even if cleanup fails
+      setTimeout(() => {
+        navigate('/', { 
+          state: { 
+            registrationError: 'Account registration failed. Please try again.'
+          } 
+        })
+      }, 3000)
+    }
+  }
+
+  const processCallback = async (currentUser: User, code: string, state: string, isRegistrationFlow: boolean) => {
     try {
       setStatus('processing')
       
@@ -67,15 +130,50 @@ const HuggingFaceCallback = () => {
         hasCode: !!code,
         hasState: !!state,
         stateValue: state,
+        isRegistrationFlow,
         localStorageState: localStorage.getItem('hf_oauth_state'),
         sessionStorageState: sessionStorage.getItem('hf_oauth_state')
       })
       
       // Exchange authorization code for access token
-      const tokenData = await handleHuggingFaceCallback(code, state)
+      let tokenData
+      try {
+        tokenData = await handleHuggingFaceCallback(code, state)
+      } catch (tokenError: any) {
+        // Handle token exchange errors
+        let errorMsg = 'Failed to exchange authorization code for access token'
+        if (tokenError?.message) {
+          errorMsg = tokenError.message
+          if (tokenError.message.includes('CSRF') || tokenError.message.includes('state')) {
+            errorMsg = 'Security validation failed. The authentication request may have been tampered with.'
+          } else if (tokenError.message.includes('invalid_grant')) {
+            errorMsg = 'Authorization code is invalid or has expired. Please try registering again.'
+          } else if (tokenError.message.includes('network') || tokenError.message.includes('fetch')) {
+            errorMsg = 'Network error while connecting to Hugging Face. Please check your connection and try again.'
+          }
+        }
+        
+        throw new Error(errorMsg)
+      }
+      
+      // Validate token data
+      if (!tokenData || !tokenData.access_token) {
+        throw new Error('Invalid token data received from Hugging Face. Authentication failed.')
+      }
       
       // Store token in Firestore
-      await storeHuggingFaceToken(currentUser, tokenData)
+      try {
+        await storeHuggingFaceToken(currentUser, tokenData)
+      } catch (storeError: any) {
+        console.error('Error storing Hugging Face token:', storeError)
+        throw new Error('Failed to save authentication token. Please try again.')
+      }
+      
+      // Registration successful - clean up registration flags
+      if (isRegistrationFlow) {
+        sessionStorage.removeItem('is_registration_flow')
+        sessionStorage.removeItem('pending_user')
+      }
       
       setStatus('success')
       
@@ -87,7 +185,8 @@ const HuggingFaceCallback = () => {
               name: currentUser.displayName || 'User', 
               email: currentUser.email 
             },
-            huggingFaceConnected: true
+            huggingFaceConnected: true,
+            registrationSuccess: isRegistrationFlow
           } 
         })
       }, 2000)
@@ -99,17 +198,19 @@ const HuggingFaceCallback = () => {
       let errorMsg = 'Failed to connect Hugging Face account'
       if (error?.message) {
         errorMsg = error.message
-        if (error.message.includes('CSRF') || error.message.includes('state')) {
-          errorMsg = 'Security validation failed. Please try connecting again from the login page.'
-        }
       }
       
       setErrorMessage(errorMsg)
       
-      // Redirect to dashboard after error
-      setTimeout(() => {
-        navigate('/dashboard')
-      }, 3000)
+      // CRITICAL: If this is a registration flow, delete the account
+      if (isRegistrationFlow) {
+        await cleanupFailedRegistration(currentUser, errorMsg)
+      } else {
+        // For existing users, just redirect to dashboard
+        setTimeout(() => {
+          navigate('/dashboard')
+        }, 3000)
+      }
     }
   }
 
