@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button'
 import { Users, Baby } from 'lucide-react'
 import { getFirebaseAuth } from '@/lib/firebase'
 import { signInWithEmailAndPassword, createUserWithEmailAndPassword, updateProfile } from 'firebase/auth'
+import { initiateHuggingFaceAuth, getHuggingFaceToken, hasValidHuggingFaceToken } from '@/lib/huggingface'
 
 const Login = () => {
   const [formData, setFormData] = useState({
@@ -27,10 +28,51 @@ const Login = () => {
         if (formData.name) {
           await updateProfile(cred.user, { displayName: formData.name })
         }
-        navigate('/dashboard', { state: { user: { name: cred.user.displayName || formData.name, email: cred.user.email } } })
+        
+        // After successful registration, prompt for Hugging Face authentication
+        // Store user info in sessionStorage to retrieve after OAuth callback
+        sessionStorage.setItem('pending_user', JSON.stringify({
+          name: cred.user.displayName || formData.name,
+          email: cred.user.email,
+          uid: cred.user.uid
+        }))
+        
+        // Initiate Hugging Face OAuth flow
+        try {
+          initiateHuggingFaceAuth()
+          // User will be redirected to Hugging Face, then back to callback
+          return
+        } catch (hfError: any) {
+          // If Hugging Face auth fails, still allow user to proceed
+          console.warn('Hugging Face authentication skipped:', hfError)
+          sessionStorage.removeItem('pending_user')
+          navigate('/dashboard', { 
+            state: { 
+              user: { 
+                name: cred.user.displayName || formData.name, 
+                email: cred.user.email 
+              },
+              huggingFaceSkipped: true
+            } 
+          })
+        }
       } else {
         const cred = await signInWithEmailAndPassword(auth, formData.email, formData.password)
-        navigate('/dashboard', { state: { user: { name: cred.user.displayName || formData.name || 'User', email: cred.user.email } } })
+        
+        // Check if user has valid Hugging Face token
+        const hasToken = await hasValidHuggingFaceToken(cred.user)
+        const token = hasToken ? await getHuggingFaceToken(cred.user) : null
+        
+        navigate('/dashboard', { 
+          state: { 
+            user: { 
+              name: cred.user.displayName || formData.name || 'User', 
+              email: cred.user.email 
+            },
+            huggingFaceConnected: hasToken,
+            huggingFaceToken: token
+          } 
+        })
       }
     } catch (err: any) {
       setError(err?.message || 'Authentication failed')

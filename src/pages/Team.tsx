@@ -2,6 +2,9 @@ import { useLocation, useNavigate } from 'react-router-dom'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import Header from '@/components/Header'
+import Hashir from '@/assets/team/hashir.png'
+import Kainat from '@/assets/team/kainat.jpeg'
+import Lameea from '@/assets/team/lameea.png'
 import { Users, Heart, Award, Sparkles, Github, Linkedin, Mail, ArrowLeft } from 'lucide-react'
 
 interface TeamMember {
@@ -30,8 +33,8 @@ const Team = () => {
     {
       id: 1,
       name: "Hashir Ehtisham",
-      image: defaultAvatar,
-      role: "",
+      image: Hashir,
+      role: "Lead AI Architect",
       specialty: "",
       experience: "",
       description: "",
@@ -41,8 +44,8 @@ const Team = () => {
     {
       id: 2,
       name: "Kainat Ali",
-      image: defaultAvatar,
-      role: "",
+      image: Kainat,
+      role: "MERN Stack Developer",
       specialty: "",
       experience: "",
       description: "",
@@ -52,8 +55,8 @@ const Team = () => {
     {
       id: 3,
       name: "Lameea Khan",
-      image: defaultAvatar,
-      role: "",
+      image: Lameea,
+      role: "Graphic Designer",
       specialty: "",
       experience: "",
       description: "",
@@ -91,7 +94,7 @@ const Team = () => {
           <div className="relative overflow-hidden rounded-2xl medical-gradient">
             <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-accent/20"></div>
             <div className="relative px-8 py-12 md:px-12 md:py-16">
-              <div className="max-w-4xl">
+              <div className="max-w-full">
                 <div className="flex items-center space-x-3 mb-6">
                   <div className="p-3 bg-white/20 rounded-xl backdrop-blur-sm">
                     <Users className="h-8 w-8 text-white" />
@@ -108,70 +111,50 @@ const Team = () => {
                   </div>
                 </div>
                 
-                <div className="grid md:grid-cols-2 gap-8 items-center">
+                <div className="grid md:grid-cols-2 gap-12 items-center">
                   <div className="space-y-4">
                     <p className="text-xl text-white/95 leading-relaxed">
-                      Meet the medical professionals and AI experts behind PregniTech, 
-                      dedicated to supporting your pregnancy journey.
+                      PREGNITECH is crafted by a dynamic, impact-driven team of engineers.
                     </p>
                     <p className="text-lg text-white/85 leading-relaxed">
-                      Our team combines decades of medical expertise with cutting-edge AI technology 
-                      to provide you with the most comprehensive pregnancy support available.
+                    Hashir Ehtisham leads the AI architecture and intelligent pregnancy insight models.<br/>
+                    Kainat Ali builds the platform’s powerful MERN stack backbone for seamless scalability.
+                    Lameea Khan elevates the visual identity and user experience with refined graphic design.
+                    Together, they merge technical precision with empathetic design to redefine maternal care.
                     </p>
-                    <div className="flex flex-wrap gap-3 mt-6">
-                      <div className="flex items-center space-x-2 bg-white/10 px-4 py-2 rounded-full backdrop-blur-sm">
-                        <div className="w-2 h-2 bg-accent rounded-full"></div>
-                        <span className="text-white text-sm font-medium">Medical Experts</span>
-                      </div>
-                      <div className="flex items-center space-x-2 bg-white/10 px-4 py-2 rounded-full backdrop-blur-sm">
-                        <div className="w-2 h-2 bg-white/60 rounded-full"></div>
-                        <span className="text-white text-sm font-medium">AI Specialists</span>
-                      </div>
-                      <div className="flex items-center space-x-2 bg-white/10 px-4 py-2 rounded-full backdrop-blur-sm">
-                        <div className="w-2 h-2 bg-white/40 rounded-full"></div>
-                        <span className="text-white text-sm font-medium">24/7 Support</span>
-                      </div>
-                    </div>
                   </div>
                   
-                  <div className="hidden md:block">
-                    <div className="relative">
-                      <div className="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent rounded-2xl transform rotate-3"></div>
-                      <div className="relative bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20">
-                        <div className="space-y-4">
-                          <div className="flex items-center space-x-3">
-                            <div className="w-3 h-3 bg-accent rounded-full"></div>
-                            <span className="text-white font-medium">Team Expertise</span>
-                          </div>
-                          <div className="space-y-3">
-                            <div className="flex justify-between text-sm text-white/80">
-                              <span>Medical Professionals</span>
-                              <span>3 Experts</span>
-                            </div>
-                            <div className="flex justify-between text-sm text-white/80">
-                              <span>Combined Experience</span>
-                              <span>37+ years</span>
-                            </div>
-                            <div className="flex justify-between text-sm text-white/80">
-                              <span>Specializations</span>
-                              <span>5+ Areas</span>
-                            </div>
-                          </div>
-                          <div className="grid grid-cols-3 gap-4 pt-2">
-                            <div className="text-center">
-                              <div className="text-2xl font-bold text-white">15+</div>
-                              <div className="text-xs text-white/70">Years Avg</div>
-                            </div>
-                            <div className="text-center">
-                              <div className="text-2xl font-bold text-white">100%</div>
-                              <div className="text-xs text-white/70">Certified</div>
-                            </div>
-                            <div className="text-center">
-                              <div className="text-2xl font-bold text-white">24/7</div>
-                              <div className="text-xs text-white/70">Available</div>
-                            </div>
+                  <div className="hidden md:block relative h-full min-h-[400px]">
+                    <div className="relative h-full flex items-end justify-end">
+                      {/* Decorative background elements */}
+                      <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent rounded-2xl transform rotate-3 opacity-50"></div>
+                      <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-white/20 to-transparent rounded-full blur-3xl"></div>
+                      
+                      {/* Image container with frame effect */}
+                      <div className="relative z-10 group">
+                        {/* Shadow/glow effect */}
+                        <div className="absolute inset-0 bg-gradient-to-br from-white/30 to-transparent rounded-3xl blur-xl group-hover:blur-2xl transition-all duration-500"></div>
+                        
+                        {/* Image frame */}
+                        <div className="relative bg-white/10 backdrop-blur-sm rounded-3xl p-3 border border-white/30 shadow-2xl group-hover:shadow-white/20 transition-all duration-500 group-hover:scale-105">
+                          {/* Inner border glow */}
+                          <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-white/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                          
+                          {/* Image */}
+                          <div className="relative overflow-hidden rounded-2xl">
+                            <img 
+                              src="https://media.istockphoto.com/id/1346944001/photo/close-up-of-co-workers-stacking-their-hands-together.jpg?s=612x612&w=0&k=20&c=lidJcFUSR3rkMt4B0yoNwH55lz3sth9o2280keqBXGE=" 
+                              alt="Our Expert Team" 
+                              className="w-full h-auto max-w-md object-cover rounded-2xl group-hover:scale-110 transition-transform duration-700"
+                            />
+                            {/* Gradient overlay for better text readability */}
+                            <div className="absolute inset-0 bg-gradient-to-t from-primary/20 via-transparent to-transparent rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                           </div>
                         </div>
+                        
+                        {/* Decorative corner accent */}
+                        <div className="absolute -top-2 -right-2 w-6 h-6 bg-accent rounded-full opacity-60 group-hover:opacity-100 group-hover:scale-125 transition-all duration-300"></div>
+                        <div className="absolute -bottom-2 -left-2 w-4 h-4 bg-white/30 rounded-full blur-sm"></div>
                       </div>
                     </div>
                   </div>
@@ -189,7 +172,7 @@ const Team = () => {
                 <Heart className="h-6 w-6 text-primary" />
               </div>
               <div>
-                <h2 className="text-3xl font-bold medical-text-primary">Our Medical Team</h2>
+                <h2 className="text-3xl font-bold medical-text-primary">Our Team</h2>
                 <p className="text-sm medical-text-muted">Expert professionals dedicated to your health</p>
               </div>
             </div>

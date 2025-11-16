@@ -1,13 +1,70 @@
+import { useState, useEffect } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import Header from '@/components/Header'
-import { Heart, Calendar, Bot, BookOpen, Apple } from 'lucide-react'
+import { Heart, Calendar, Bot, BookOpen, Apple, X, Sparkles } from 'lucide-react'
+import { useAuth } from '@/contexts/AuthContext'
+import { initiateHuggingFaceAuth } from '@/lib/huggingface'
 
 const Dashboard = () => {
   const location = useLocation()
   const navigate = useNavigate()
   const user = location.state?.user
+  const { isHuggingFaceConnected, user: authUser, refreshHuggingFaceToken } = useAuth()
+  const [showHuggingFaceBanner, setShowHuggingFaceBanner] = useState(false)
+  const [dismissedBanner, setDismissedBanner] = useState(false)
+
+  // Check if user needs to connect Hugging Face
+  useEffect(() => {
+    // Check if banner was dismissed in this session
+    const bannerDismissed = sessionStorage.getItem('hf_banner_dismissed')
+    if (bannerDismissed === 'true') {
+      setDismissedBanner(true)
+    }
+
+    // Show banner if user is logged in but doesn't have HF token
+    if (authUser && !isHuggingFaceConnected && !dismissedBanner) {
+      setShowHuggingFaceBanner(true)
+    } else {
+      setShowHuggingFaceBanner(false)
+    }
+  }, [authUser, isHuggingFaceConnected, dismissedBanner])
+
+  // Refresh token status when coming back from OAuth callback
+  useEffect(() => {
+    if (location.state?.huggingFaceConnected) {
+      refreshHuggingFaceToken()
+      setShowHuggingFaceBanner(false)
+      // Clear dismissed state since they successfully connected
+      setDismissedBanner(false)
+      sessionStorage.removeItem('hf_banner_dismissed')
+    }
+  }, [location.state, refreshHuggingFaceToken])
+
+  // Also check connection status periodically in case token was added elsewhere
+  useEffect(() => {
+    if (isHuggingFaceConnected && dismissedBanner) {
+      // If connected but was previously dismissed, clear dismissed state
+      setDismissedBanner(false)
+      sessionStorage.removeItem('hf_banner_dismissed')
+    }
+  }, [isHuggingFaceConnected, dismissedBanner])
+
+  const handleConnectHuggingFace = () => {
+    try {
+      initiateHuggingFaceAuth()
+    } catch (error: any) {
+      console.error('Error initiating Hugging Face auth:', error)
+      alert('Failed to connect Hugging Face. Please try again.')
+    }
+  }
+
+  const handleDismissBanner = () => {
+    setShowHuggingFaceBanner(false)
+    setDismissedBanner(true)
+    sessionStorage.setItem('hf_banner_dismissed', 'true')
+  }
 
   const handleMonthSelect = (month: number) => {
     navigate(`/month/${month}`, { state: { user } })
@@ -34,6 +91,45 @@ const Dashboard = () => {
 
       {/* Main Content */}
       <main className="medical-container px-4 sm:px-6 lg:px-8 py-8">
+        {/* Hugging Face Connection Banner */}
+        {showHuggingFaceBanner && (
+          <div className="mb-6 relative">
+            <Card className="border-2 border-primary/30 bg-gradient-to-r from-primary/10 via-accent/10 to-primary/10">
+              <CardContent className="p-4">
+                <div className="flex items-start justify-between gap-4">
+                  <div className="flex items-start gap-3 flex-1">
+                    <div className="p-2 bg-primary/20 rounded-lg">
+                      <Sparkles className="h-5 w-5 text-primary" />
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="font-semibold medical-text-primary mb-1">
+                        Connect Your Hugging Face Account
+                      </h3>
+                      <p className="text-sm medical-text-secondary mb-3">
+                        Connect your Hugging Face account to unlock enhanced AI features and personalized assistance throughout your pregnancy journey.
+                      </p>
+                      <Button
+                        onClick={handleConnectHuggingFace}
+                        className="bg-primary hover:bg-primary/90 text-white"
+                        size="sm"
+                      >
+                        Connect Hugging Face
+                      </Button>
+                    </div>
+                  </div>
+                  <button
+                    onClick={handleDismissBanner}
+                    className="p-1 hover:bg-white/20 rounded-full transition-colors"
+                    aria-label="Dismiss"
+                  >
+                    <X className="h-4 w-4 text-gray-500" />
+                  </button>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        )}
+
         {/* Welcome Section */}
         <div className="mb-12">
           <div className="relative overflow-hidden rounded-2xl medical-gradient">

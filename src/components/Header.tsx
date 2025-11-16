@@ -1,9 +1,10 @@
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { Baby, LogOut, ArrowLeft, Menu, X, Bell, Users, Home } from 'lucide-react'
+import { Baby, LogOut, ArrowLeft, Menu, X, Bell, Users, Home, Sparkles, CheckCircle2 } from 'lucide-react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { useState } from 'react'
 import { useAuth } from '@/contexts/AuthContext'
+import { initiateHuggingFaceAuth } from '@/lib/huggingface'
 
 interface HeaderProps {
   user?: {
@@ -20,7 +21,7 @@ const Header = ({ user, showBackButton = false, backPath = '/dashboard', title, 
   const navigate = useNavigate()
   const location = useLocation()
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
-  const { user: authUser, logout } = useAuth()
+  const { user: authUser, logout, isHuggingFaceConnected } = useAuth()
 
   const handleLogout = async () => {
     await logout()
@@ -37,6 +38,15 @@ const Header = ({ user, showBackButton = false, backPath = '/dashboard', title, 
 
   const getUserInitials = (name: string) => {
     return name.split(' ').map(n => n[0]).join('').toUpperCase()
+  }
+
+  const handleConnectHuggingFace = () => {
+    try {
+      initiateHuggingFaceAuth()
+    } catch (error: any) {
+      console.error('Error initiating Hugging Face auth:', error)
+      alert('Failed to connect Hugging Face. Please try again.')
+    }
   }
 
   const effectiveUser = user || (authUser ? { name: authUser.displayName || 'User', email: authUser.email || '' } : undefined)
@@ -131,7 +141,20 @@ const Header = ({ user, showBackButton = false, backPath = '/dashboard', title, 
                     {getUserInitials(effectiveUser.name)}
                   </div>
                   <div className="text-left">
-                    <p className="text-sm font-medium medical-text-primary">{effectiveUser.name}</p>
+                    <div className="flex items-center gap-2">
+                      <p className="text-sm font-medium medical-text-primary">{effectiveUser.name}</p>
+                      {isHuggingFaceConnected ? (
+                        <CheckCircle2 className="h-3 w-3 text-green-500" title="Hugging Face Connected" />
+                      ) : (
+                        <button
+                          onClick={handleConnectHuggingFace}
+                          className="p-0.5 hover:bg-primary/10 rounded transition-colors"
+                          title="Connect Hugging Face"
+                        >
+                          <Sparkles className="h-3 w-3 text-gray-400 hover:text-primary" />
+                        </button>
+                      )}
+                    </div>
                     <p className="text-xs medical-text-muted hidden lg:block">{effectiveUser.email}</p>
                   </div>
                 </div>

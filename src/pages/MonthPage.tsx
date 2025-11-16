@@ -1,12 +1,18 @@
 import { useParams, useLocation } from 'react-router-dom'
+import { useEffect, useRef } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
 import Header from '@/components/Header'
-import { Heart, Brain, Activity, Shield, Baby } from 'lucide-react'
+import { Heart, Brain, Activity, Shield, Baby, Sparkles, AlertCircle } from 'lucide-react'
+import { useAuth } from '@/contexts/AuthContext'
+import { initiateHuggingFaceAuth } from '@/lib/huggingface'
 
 const MonthPage = () => {
   const { month } = useParams<{ month: string }>()
   const location = useLocation()
   const user = location.state?.user
+  const { huggingFaceToken, isHuggingFaceConnected } = useAuth()
+  const iframeRef = useRef<HTMLIFrameElement>(null)
 
 
   const monthData = {
@@ -248,6 +254,60 @@ const MonthPage = () => {
 
   const currentMonth = monthData[month as keyof typeof monthData] || monthData['1']
 
+  // Send token to iframe via postMessage when iframe loads
+  useEffect(() => {
+    const iframe = iframeRef.current
+    if (!iframe || !huggingFaceToken?.access_token) return
+
+    const handleIframeLoad = () => {
+      // Send token to iframe via postMessage
+      iframe.contentWindow?.postMessage(
+        {
+          type: 'hf_token',
+          token: huggingFaceToken.access_token,
+        },
+        '*'
+      )
+    }
+
+    iframe.addEventListener('load', handleIframeLoad)
+    return () => {
+      iframe.removeEventListener('load', handleIframeLoad)
+    }
+  }, [huggingFaceToken, month])
+
+  // Build iframe URL - Hugging Face Spaces don't support token auth in iframe
+  // The Space needs to be public or use a different authentication method
+  const getIframeUrl = () => {
+    const baseUrl = `https://hashirehtisham-pregnitech-month-${month}.hf.space`
+    // Try different token parameter formats that some Spaces might support
+    if (huggingFaceToken?.access_token) {
+      // Some Spaces support hf_token or token parameter
+      return `${baseUrl}?hf_token=${encodeURIComponent(huggingFaceToken.access_token)}`
+    }
+    return baseUrl
+  }
+
+  // Open Space in new window with token (workaround for iframe restrictions)
+  const openSpaceInNewWindow = () => {
+    const baseUrl = `https://hashirehtisham-pregnitech-month-${month}.hf.space`
+    let url = baseUrl
+    if (huggingFaceToken?.access_token) {
+      // Pass token in URL for new window
+      url = `${baseUrl}?hf_token=${encodeURIComponent(huggingFaceToken.access_token)}`
+    }
+    window.open(url, '_blank', 'noopener,noreferrer')
+  }
+
+  const handleConnectHuggingFace = () => {
+    try {
+      initiateHuggingFaceAuth()
+    } catch (error: any) {
+      console.error('Error initiating Hugging Face auth:', error)
+      alert('Failed to connect Hugging Face. Please try again.')
+    }
+  }
+
   return (
     <div className="min-h-screen medical-hero">
       <Header 
@@ -465,16 +525,69 @@ const MonthPage = () => {
             </div>
             
             {/* HuggingFace AI Assistant Iframe */}
-            <div className="relative w-full flex items-center justify-center rounded-xl overflow-hidden bg-gradient-to-br from-secondary to-gray-50/50 border medical-border">
-              <iframe
-                src={`https://hashirehtisham-pregnitech-month-${month}.hf.space`}
-                frameBorder="0"
-                width="850"
-                height="450"
-                className="w-full max-w-full h-[650px] md:h-[700px] rounded-xl"
-                title={`PregniTech Month ${month} AI Assistant`}
-              />
-            </div>
+            {!isHuggingFaceConnected ? (
+              <div className="relative w-full flex items-center justify-center rounded-xl overflow-hidden bg-gradient-to-br from-yellow-50 to-orange-50 border-2 border-yellow-200">
+                <div className="p-8 text-center max-w-md">
+                  <div className="mb-4 flex justify-center">
+                    <div className="p-3 bg-yellow-100 rounded-full">
+                      <AlertCircle className="h-8 w-8 text-yellow-600" />
+                    </div>
+                  </div>
+                  <h3 className="text-xl font-semibold medical-text-primary mb-2">
+                    Connect Hugging Face to Use AI Assistant
+                  </h3>
+                  <p className="text-sm medical-text-secondary mb-6">
+                    To access the AI Pregnancy Assistant, please connect your Hugging Face account. This will enable personalized AI guidance for your pregnancy journey.
+                  </p>
+                  <Button
+                    onClick={handleConnectHuggingFace}
+                    className="bg-primary hover:bg-primary/90 text-white"
+                  >
+                    <Sparkles className="h-4 w-4 mr-2" />
+                    Connect Hugging Face
+                  </Button>
+                </div>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {/* Info banner about iframe limitations */}
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                  <div className="flex items-start gap-3">
+                    <div className="p-1 bg-blue-100 rounded">
+                      <AlertCircle className="h-4 w-4 text-blue-600" />
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-sm text-blue-800 mb-2">
+                        <strong>Note:</strong> If you see a "Sign in with Hugging Face" button in the chat, you can click "Open in New Tab" below to access the full Space experience.
+                      </p>
+                      <Button
+                        onClick={openSpaceInNewWindow}
+                        variant="outline"
+                        size="sm"
+                        className="border-blue-300 text-blue-700 hover:bg-blue-100"
+                      >
+                        Open Space in New Tab
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Iframe - may show login button due to iframe restrictions */}
+                <div className="relative w-full flex items-center justify-center rounded-xl overflow-hidden bg-gradient-to-br from-secondary to-gray-50/50 border medical-border">
+                  <iframe
+                    ref={iframeRef}
+                    src={getIframeUrl()}
+                    frameBorder="0"
+                    width="850"
+                    height="450"
+                    className="w-full max-w-full h-[650px] md:h-[700px] rounded-xl"
+                    title={`PregniTech Month ${month} AI Assistant`}
+                    allow="microphone; camera"
+                    sandbox="allow-same-origin allow-scripts allow-forms allow-popups allow-popups-to-escape-sandbox"
+                  />
+                </div>
+              </div>
+            )}
           </CardContent>
         </Card>
       </main>
