@@ -10,15 +10,12 @@ const HuggingFaceCallback = () => {
   const navigate = useNavigate()
   const [status, setStatus] = useState<'processing' | 'success' | 'error'>('processing')
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
-  const [user, setUser] = useState<User | null>(null)
 
   useEffect(() => {
     const auth = getFirebaseAuth()
     
     // Wait for Firebase auth to be ready
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      setUser(currentUser)
-      
       if (!currentUser) {
         setStatus('error')
         setErrorMessage('You must be logged in to connect Hugging Face. Please log in first.')

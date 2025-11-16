@@ -1,5 +1,5 @@
 import { getFirestoreDB } from './firebase'
-import { doc, setDoc, getDoc, type DocumentData } from 'firebase/firestore'
+import { doc, setDoc, getDoc } from 'firebase/firestore'
 import type { User } from 'firebase/auth'
 
 // Hugging Face OAuth configuration

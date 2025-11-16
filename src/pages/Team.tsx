@@ -28,7 +28,6 @@ const Team = () => {
   const navigate = useNavigate()
   const user = location.state?.user
 
-  const defaultAvatar = "https://www.gravatar.com/avatar/?d=mp&f=y"
   const teamMembers: TeamMember[] = [
     {
       id: 1,

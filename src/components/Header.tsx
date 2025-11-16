@@ -144,7 +144,9 @@ const Header = ({ user, showBackButton = false, backPath = '/dashboard', title, 
                     <div className="flex items-center gap-2">
                       <p className="text-sm font-medium medical-text-primary">{effectiveUser.name}</p>
                       {isHuggingFaceConnected ? (
-                        <CheckCircle2 className="h-3 w-3 text-green-500" title="Hugging Face Connected" />
+                        <div title="Hugging Face Connected">
+                          <CheckCircle2 className="h-3 w-3 text-green-500" />
+                        </div>
                       ) : (
                         <button
                           onClick={handleConnectHuggingFace}
