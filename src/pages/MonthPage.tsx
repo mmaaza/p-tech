@@ -279,7 +279,7 @@ const MonthPage = () => {
   // Build iframe URL - Hugging Face Spaces don't support token auth in iframe
   // The Space needs to be public or use a different authentication method
   const getIframeUrl = () => {
-    const baseUrl = `https://hashirehtisham-pregnitech-month-${month}.hf.space`
+    const baseUrl = 'https://hashirehtisham-pregnitech-final.hf.space'
     // Try different token parameter formats that some Spaces might support
     if (huggingFaceToken?.access_token) {
       // Some Spaces support hf_token or token parameter
@@ -290,7 +290,7 @@ const MonthPage = () => {
 
   // Open Space in new window with token (workaround for iframe restrictions)
   const openSpaceInNewWindow = () => {
-    const baseUrl = `https://hashirehtisham-pregnitech-month-${month}.hf.space`
+    const baseUrl = 'https://hashirehtisham-pregnitech-final.hf.space'
     let url = baseUrl
     if (huggingFaceToken?.access_token) {
       // Pass token in URL for new window
